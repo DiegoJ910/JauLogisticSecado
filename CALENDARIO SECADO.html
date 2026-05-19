@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel de Control – Calderas y Secado</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     PANEL DE CONTROL – CALDERAS Y SECADO
+     Autor: Diego Jauregui / Ingeniería Industrial
+     Versión: 1.0
+  ============================================================ */
+
+  :root {
+    --bg-deep:      #0f1117;
+    --bg-panel:     #161b27;
+    --bg-card:      #1e2535;
+    --bg-hover:     #252d42;
+    --border:       #2a3348;
+    --border-light: #3a4560;
+    --accent:       #e07b2a;
+    --accent-dim:   #a0561c;
+    --accent-glow:  rgba(224,123,42,0.18);
+    --accent2:      #f0a045;
+    --text-primary: #e8ecf4;
+    --text-secondary:#8e98b0;
+    --text-muted:   #5a647a;
+    --leader-gold:  #f5c518;
+    --success:      #2ecc71;
+    --danger:       #e74c3c;
+    --info:         #3498db;
+    --font-title:   'Rajdhani', sans-serif;
+    --font-body:    'Source Sans 3', sans-serif;
+    --radius:       10px;
+    --radius-sm:    6px;
+    --shadow:       0 4px 24px rgba(0,0,0,0.4);
+    --shadow-card:  0 2px 12px rgba(0,0,0,0.3);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── HEADER ─────────────────────────────────────────────── */
+  .header {
+    background: linear-gradient(135deg, #11151f 0%, #1a2236 100%);
+    border-bottom: 2px solid var(--accent);
+    padding: 0 28px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 20px rgba(224,123,42,0.15);
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .logo-box {
+    width: 42px; height: 42px;
+    background: var(--accent);
+    border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 0 14px rgba(224,123,42,0.45);
+  }
+
+  .header h1 {
+    font-family: var(--font-title);
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-primary);
+  }
+
+  .header h1 span { color: var(--accent); }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .badge-live {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(46,204,113,0.12);
+    border: 1px solid rgba(46,204,113,0.3);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--success);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+
+  .badge-live::before {
+    content:'';
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--success);
+    animation: pulse 1.8s infinite;
+  }
+
+  @keyframes pulse {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* ── LAYOUT ─────────────────────────────────────────────── */
+  .app-body {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 20px;
+    padding: 20px 24px;
+    flex: 1;
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  /* ── MAIN ───────────────────────────────────────────────── */
+  .main-panel { display: flex; flex-direction: column; gap: 18px; }
+
+  /* ── NAV CALENDARIO ─────────────────────────────────────── */
+  .cal-nav {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--shadow-card);
+  }
+
+  .cal-nav h2 {
+    font-family: var(--font-title);
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent2);
+  }
+
+  .nav-btns { display: flex; gap: 8px; }
+
+  .btn-nav {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    width: 36px; height: 36px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .2s;
+  }
+
+  .btn-nav:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .btn-today {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    color: var(--text-secondary);
+    padding: 0 14px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    height: 36px;
+    transition: all .2s;
+    font-family: var(--font-body);
+  }
+
+  .btn-today:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ── GRID CALENDARIO ────────────────────────────────────── */
+  .calendar-wrap {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    box-shadow: var(--shadow-card);
+    flex: 1;
+  }
+
+  .cal-week-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+
+  .cal-week-header div {
+    text-align: center;
+    font-family: var(--font-title);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 6px 0;
+  }
+
+  .cal-week-header div:first-child,
+  .cal-week-header div:last-child { color: var(--accent-dim); }
+
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+
+  .cal-day {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    min-height: 96px;
+    padding: 6px;
+    cursor: pointer;
+    transition: all .2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cal-day:hover {
+    border-color: var(--accent);
+    background: var(--bg-hover);
+    box-shadow: 0 0 0 1px var(--accent-glow) inset;
+  }
+
+  .cal-day.empty {
+    background: transparent;
+    border-color: transparent;
+    cursor: default;
+    pointer-events: none;
+  }
+
+  .cal-day.today {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-glow) inset, 0 0 12px var(--accent-glow);
+  }
+
+  .cal-day.weekend .day-num { color: var(--accent-dim); }
+
+  .day-num {
+    font-family: var(--font-title);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .cal-day.today .day-num {
+    color: var(--accent);
+  }
+
+  .shift-pills {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: 68px;
+    overflow: hidden;
+  }
+
+  .shift-pill {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    background: rgba(224,123,42,0.12);
+    border: 1px solid rgba(224,123,42,0.25);
+    border-radius: 3px;
+    padding: 2px 5px;
+    font-size: 0.62rem;
+    font-weight: 600;
+    color: var(--accent2);
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .shift-pill.leader {
+    background: rgba(245,197,24,0.15);
+    border-color: rgba(245,197,24,0.35);
+    color: var(--leader-gold);
+  }
+
+  .pill-icon { font-size: 0.65rem; flex-shrink: 0; }
+
+  .more-tag {
+    font-size: 0.58rem;
+    color: var(--text-muted);
+    padding: 1px 4px;
+  }
+
+  /* ── MODAL ──────────────────────────────────────────────── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s;
+  }
+
+  .modal-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .modal {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-light);
+    border-radius: 14px;
+    width: 520px;
+    max-width: 94vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+    transform: translateY(16px);
+    transition: transform .25s;
+  }
+
+  .modal-overlay.open .modal { transform: translateY(0); }
+
+  .modal-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .modal-header h3 {
+    font-family: var(--font-title);
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--accent2);
+  }
+
+  .modal-date-badge {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-close {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    width: 30px; height: 30px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .2s;
+  }
+
+  .btn-close:hover { background: var(--danger); border-color: var(--danger); color: #fff; }
+
+  .modal-body { padding: 20px 24px; }
+
+  /* Existing shifts in modal */
+  .modal-shifts {
+    margin-bottom: 18px;
+  }
+
+  .modal-shifts-title {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  .modal-shift-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+
+  .modal-shift-info { display: flex; flex-direction: column; gap: 2px; }
+
+  .modal-shift-name {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .modal-shift-detail {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+
+  .btn-remove-shift {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    width: 26px; height: 26px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .15s;
+    flex-shrink: 0;
+  }
+
+  .btn-remove-shift:hover { background: var(--danger); border-color: var(--danger); color: #fff; }
+
+  /* Form */
+  .form-section-title {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+
+  .form-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 16px 0;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group.full { grid-column: 1/-1; }
+
+  label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  input[type="text"], select, input[type="time"] {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    padding: 9px 12px;
+    font-size: 0.88rem;
+    font-family: var(--font-body);
+    transition: border-color .2s;
+    outline: none;
+    width: 100%;
+  }
+
+  input[type="text"]:focus,
+  select:focus,
+  input[type="time"]:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+
+  select option { background: var(--bg-card); }
+
+  .role-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .role-btn {
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    padding: 10px 8px;
+    cursor: pointer;
+    font-size: 0.78rem;
+    font-weight: 600;
+    font-family: var(--font-body);
+    text-align: center;
+    transition: all .2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .role-btn .role-icon { font-size: 1.2rem; }
+
+  .role-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .role-btn.active-op {
+    border-color: var(--accent);
+    background: var(--accent-glow);
+    color: var(--accent2);
+  }
+
+  .role-btn.active-leader {
+    border-color: var(--leader-gold);
+    background: rgba(245,197,24,0.1);
+    color: var(--leader-gold);
+  }
+
+  .shift-presets {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+
+  .preset-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.72rem;
+    font-weight: 600;
+    font-family: var(--font-body);
+    transition: all .15s;
+    white-space: nowrap;
+  }
+
+  .preset-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .hours-preview {
+    background: var(--bg-deep);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  .hours-preview span {
+    color: var(--accent2);
+    font-weight: 700;
+    font-family: var(--font-title);
+    font-size: 1rem;
+  }
+
+  .btn-add-shift {
+    width: 100%;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dim) 100%);
+    border: none;
+    color: #fff;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 700;
+    font-family: var(--font-title);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    transition: all .2s;
+    box-shadow: 0 4px 14px rgba(224,123,42,0.35);
+    margin-top: 14px;
+  }
+
+  .btn-add-shift:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(224,123,42,0.45);
+  }
+
+  /* ── SIDEBAR ────────────────────────────────────────────── */
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .sidebar-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    box-shadow: var(--shadow-card);
+  }
+
+  .sidebar-title {
+    font-family: var(--font-title);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .sidebar-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Stats bar */
+  .stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .stat-box {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    text-align: center;
+  }
+
+  .stat-val {
+    font-family: var(--font-title);
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--accent2);
+    line-height: 1;
+  }
+
+  .stat-lbl {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-top: 3px;
+  }
+
+  /* Worker list */
+  .worker-list { display: flex; flex-direction: column; gap: 6px; max-height: 340px; overflow-y: auto; }
+
+  .worker-list::-webkit-scrollbar { width: 4px; }
+  .worker-list::-webkit-scrollbar-track { background: transparent; }
+  .worker-list::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 2px; }
+
+  .worker-row {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 9px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: border-color .2s;
+  }
+
+  .worker-row:hover { border-color: var(--border-light); }
+
+  .worker-row.top-worker { border-color: rgba(224,123,42,0.4); }
+
+  .worker-name-cell { display: flex; flex-direction: column; gap: 1px; }
+
+  .worker-name {
+    font-size: 0.83rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex; align-items: center; gap: 5px;
+  }
+
+  .worker-shifts {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+  }
+
+  .worker-hours {
+    font-family: var(--font-title);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent2);
+    white-space: nowrap;
+  }
+
+  .bar-wrap {
+    height: 3px;
+    background: var(--bg-deep);
+    border-radius: 2px;
+    margin-top: 5px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-dim), var(--accent));
+    border-radius: 2px;
+    transition: width .4s;
+  }
+
+  .empty-state {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    padding: 20px 0;
+  }
+
+  /* ── ACTION BUTTONS ─────────────────────────────────────── */
+  .btn-print {
+    width: 100%;
+    background: var(--bg-card);
+    border: 2px solid var(--accent);
+    color: var(--accent2);
+    padding: 13px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-family: var(--font-title);
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    transition: all .2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-print:hover {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 4px 18px rgba(224,123,42,0.35);
+  }
+
+  .btn-clear {
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 9px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    transition: all .2s;
+  }
+
+  .btn-clear:hover { border-color: var(--danger); color: var(--danger); }
+
+  /* ── PRINT STYLES ───────────────────────────────────────── */
+  @media print {
+    @page { size: A4; margin: 12mm 14mm; }
+
+    body {
+      background: #fff !important;
+      color: #111 !important;
+      font-family: Arial, sans-serif;
+    }
+
+    .header {
+      background: #fff !important;
+      border-bottom: 2px solid #333 !important;
+      box-shadow: none !important;
+      position: relative;
+      padding: 8px 0;
+    }
+
+    .logo-box { background: #333 !important; box-shadow: none !important; }
+    .badge-live, .btn-nav, .btn-today { display: none !important; }
+    .header h1 { color: #111 !important; }
+    .header h1 span { color: #333 !important; }
+    .cal-nav h2 { color: #111 !important; }
+    .nav-btns, .btn-today { display: none !important; }
+
+    .app-body {
+      display: block !important;
+      padding: 0;
+    }
+
+    .sidebar { display: none !important; }
+
+    .cal-nav {
+      background: #fff !important;
+      border: none !important;
+      box-shadow: none !important;
+      margin-bottom: 6px;
+    }
+
+    .calendar-wrap {
+      background: #fff !important;
+      border: 1px solid #ddd !important;
+      box-shadow: none !important;
+    }
+
+    .cal-week-header div { color: #555 !important; }
+
+    .cal-day {
+      background: #fafafa !important;
+      border-color: #ccc !important;
+      min-height: 72px;
+    }
+
+    .cal-day.today {
+      border-color: #333 !important;
+      box-shadow: none !important;
+    }
+
+    .day-num { color: #222 !important; }
+    .cal-day.today .day-num { color: #000 !important; font-weight: 900 !important; }
+
+    .shift-pill {
+      background: #eee !important;
+      border-color: #aaa !important;
+      color: #111 !important;
+    }
+
+    .shift-pill.leader {
+      background: #f0f0f0 !important;
+      border-color: #666 !important;
+      color: #111 !important;
+      font-weight: 700 !important;
+    }
+
+    .modal-overlay { display: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ─────────────────────────────────────────────── -->
+<header class="header">
+  <div class="header-left">
+    <div class="logo-box">🔥</div>
+    <h1>Panel de Control &mdash; <span>Calderas &amp; Secado</span></h1>
+  </div>
+  <div class="header-right">
+    <div class="badge-live">Sistema Activo</div>
+  </div>
+</header>
+
+<!-- ── APP BODY ─────────────────────────────────────────────── -->
+<div class="app-body">
+
+  <!-- MAIN -->
+  <div class="main-panel">
+
+    <!-- Cal nav -->
+    <div class="cal-nav">
+      <div class="nav-btns">
+        <button class="btn-nav" id="btnPrev" title="Mes anterior">&#8249;</button>
+        <button class="btn-today" id="btnToday">HOY</button>
+        <button class="btn-nav" id="btnNext" title="Mes siguiente">&#8250;</button>
+      </div>
+      <h2 id="calTitle"></h2>
+      <div style="width:140px"></div>
+    </div>
+
+    <!-- Calendar -->
+    <div class="calendar-wrap">
+      <div class="cal-week-header">
+        <div>DOM</div><div>LUN</div><div>MAR</div><div>MIÉ</div>
+        <div>JUE</div><div>VIE</div><div>SÁB</div>
+      </div>
+      <div class="calendar-grid" id="calGrid"></div>
+    </div>
+
+  </div><!-- /main-panel -->
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <!-- Stats -->
+    <div class="sidebar-card">
+      <div class="sidebar-title">Resumen del Mes</div>
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-val" id="statTurnos">0</div>
+          <div class="stat-lbl">Turnos</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="statHoras">0</div>
+          <div class="stat-lbl">Horas Total</div>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-val" id="statTrabajadores">0</div>
+          <div class="stat-lbl">Operadores</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="statLideres">0</div>
+          <div class="stat-lbl">Líderes</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Worker hours -->
+    <div class="sidebar-card" style="flex:1">
+      <div class="sidebar-title">Horas por Operador</div>
+      <div class="worker-list" id="workerList">
+        <div class="empty-state">Sin asignaciones aún.<br>Haz clic en un día del calendario.</div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="sidebar-card">
+      <button class="btn-print" onclick="window.print()">
+        🖨️ Generar Reporte Impresión
+      </button>
+      <div style="height:8px"></div>
+      <button class="btn-clear" id="btnClear">⚠ Limpiar Todos los Turnos</button>
+    </div>
+
+  </aside>
+
+</div><!-- /app-body -->
+
+<!-- ── MODAL ─────────────────────────────────────────────── -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-date-badge" id="modalDateBadge"></div>
+        <h3>Asignación de Turno</h3>
+      </div>
+      <button class="btn-close" id="btnModalClose">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Existing shifts -->
+      <div class="modal-shifts">
+        <div class="modal-shifts-title">Turnos asignados</div>
+        <div id="existingShifts"></div>
+      </div>
+
+      <hr class="form-divider">
+
+      <!-- New shift form -->
+      <div class="form-section-title">Agregar nuevo turno</div>
+
+      <div class="form-group" style="margin-bottom:12px">
+        <label>Nombre del Operador</label>
+        <input type="text" id="fName" placeholder="Ej: Carlos Mendoza" autocomplete="off">
+      </div>
+
+      <div class="form-group" style="margin-bottom:12px">
+        <label>Rol</label>
+        <div class="role-selector">
+          <button class="role-btn active-op" id="roleOp" onclick="selectRole('Calderista')">
+            <span class="role-icon">🔧</span>Calderista
+          </button>
+          <button class="role-btn" id="roleLeader" onclick="selectRole('Líder de Turno')">
+            <span class="role-icon">⭐</span>Líder de Turno
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom:6px">
+        <label>Turnos Predefinidos</label>
+        <div class="shift-presets">
+          <button class="preset-btn" onclick="applyPreset('06:00','14:00')">Mañana 06-14</button>
+          <button class="preset-btn" onclick="applyPreset('14:00','22:00')">Tarde 14-22</button>
+          <button class="preset-btn" onclick="applyPreset('22:00','06:00')">Noche 22-06</button>
+          <button class="preset-btn" onclick="applyPreset('07:00','15:00')">Día 07-15</button>
+          <button class="preset-btn" onclick="applyPreset('08:00','17:00')">Jornada 08-17</button>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Entrada</label>
+          <input type="time" id="fEntry" value="06:00">
+        </div>
+        <div class="form-group">
+          <label>Salida</label>
+          <input type="time" id="fExit" value="14:00">
+        </div>
+      </div>
+
+      <div class="hours-preview">
+        Duración del turno: <span id="hoursPreview">8h 00m</span>
+      </div>
+
+      <button class="btn-add-shift" id="btnAddShift">+ Agregar Turno</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── JAVASCRIPT ────────────────────────────────────────── -->
+<script>
+/* ============================================================
+   PANEL DE CONTROL – CALDERAS Y SECADO | Vanilla JS Engine
+   HECHO POR DIEGO JAUREGUI
+============================================================ */
+
+// ── STATE ──────────────────────────────────────────────────
+let currentDate  = new Date();
+let currentYear  = currentDate.getFullYear();
+let currentMonth = currentDate.getMonth();
+let selectedDay  = null;
+let selectedRole = 'Calderista';
+
+// shifts: { "YYYY-MM-DD": [ {name, role, entry, exit, hours}, ... ] }
+let shifts = JSON.parse(localStorage.getItem('balsasud_shifts') || '{}');
+
+// ── UTILS ──────────────────────────────────────────────────
+const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+                'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+function pad(n){ return String(n).padStart(2,'0'); }
+
+function dateKey(y,m,d){ return `${y}-${pad(m+1)}-${pad(d)}`; }
+
+function calcHours(entry, exit){
+  // supports overnight shifts
+  let [eh,em] = entry.split(':').map(Number);
+  let [xh,xm] = exit.split(':').map(Number);
+  let mins = (xh*60+xm) - (eh*60+em);
+  if(mins <= 0) mins += 24*60;
+  return mins;
+}
+
+function fmtHours(mins){
+  const h = Math.floor(mins/60);
+  const m = mins % 60;
+  return m > 0 ? `${h}h ${pad(m)}m` : `${h}h`;
+}
+
+function saveState(){ localStorage.setItem('balsasud_shifts', JSON.stringify(shifts)); }
+
+// ── CALENDAR RENDER ────────────────────────────────────────
+function renderCalendar(){
+  const today = new Date();
+  document.getElementById('calTitle').textContent =
+    `${MONTHS[currentMonth].toUpperCase()} ${currentYear}`;
+
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+
+  const firstDay  = new Date(currentYear, currentMonth, 1).getDay();
+  const daysInMonth = new Date(currentYear, currentMonth+1, 0).getDate();
+
+  // blank cells
+  for(let i=0; i<firstDay; i++){
+    const blank = document.createElement('div');
+    blank.className = 'cal-day empty';
+    grid.appendChild(blank);
+  }
+
+  for(let d=1; d<=daysInMonth; d++){
+    const cell = document.createElement('div');
+    const key  = dateKey(currentYear, currentMonth, d);
+    const dow  = new Date(currentYear, currentMonth, d).getDay();
+
+    cell.className = 'cal-day';
+    if(dow===0||dow===6) cell.classList.add('weekend');
+    if(today.getFullYear()===currentYear &&
+       today.getMonth()===currentMonth &&
+       today.getDate()===d) cell.classList.add('today');
+
+    // day number
+    const numEl = document.createElement('div');
+    numEl.className = 'day-num';
+    numEl.textContent = d;
+    cell.appendChild(numEl);
+
+    // shift pills
+    const dayShifts = shifts[key] || [];
+    const pillsWrap = document.createElement('div');
+    pillsWrap.className = 'shift-pills';
+
+    dayShifts.slice(0,3).forEach(s => {
+      const pill = document.createElement('div');
+      pill.className = 'shift-pill' + (s.role==='Líder de Turno'?' leader':'');
+      pill.innerHTML = `<span class="pill-icon">${s.role==='Líder de Turno'?'⭐':'🔧'}</span>
+        ${s.name.split(' ')[0]}`;
+      pillsWrap.appendChild(pill);
+    });
+
+    if(dayShifts.length > 3){
+      const more = document.createElement('div');
+      more.className = 'more-tag';
+      more.textContent = `+${dayShifts.length-3} más`;
+      pillsWrap.appendChild(more);
+    }
+
+    cell.appendChild(pillsWrap);
+    cell.addEventListener('click', () => openModal(d, key));
+    grid.appendChild(cell);
+  }
+
+  updateSidebar();
+}
+
+// ── SIDEBAR ────────────────────────────────────────────────
+function updateSidebar(){
+  // Collect all shifts for current month
+  const prefix = `${currentYear}-${pad(currentMonth+1)}-`;
+  const monthShifts = Object.entries(shifts)
+    .filter(([k]) => k.startsWith(prefix))
+    .flatMap(([,v]) => v);
+
+  // stats
+  document.getElementById('statTurnos').textContent = monthShifts.length;
+  document.getElementById('statHoras').textContent =
+    Math.round(monthShifts.reduce((a,s)=>a+s.hours,0)/60);
+
+  const workers = {};
+  monthShifts.forEach(s => {
+    if(!workers[s.name]) workers[s.name] = {mins:0, shifts:0, isLeader:false};
+    workers[s.name].mins   += s.hours;
+    workers[s.name].shifts += 1;
+    if(s.role==='Líder de Turno') workers[s.name].isLeader = true;
+  });
+
+  const names = Object.keys(workers);
+  document.getElementById('statTrabajadores').textContent = names.length;
+  document.getElementById('statLideres').textContent =
+    names.filter(n=>workers[n].isLeader).length;
+
+  const list = document.getElementById('workerList');
+
+  if(names.length === 0){
+    list.innerHTML = '<div class="empty-state">Sin asignaciones aún.<br>Haz clic en un día del calendario.</div>';
+    return;
+  }
+
+  // Sort by hours desc
+  const sorted = names.sort((a,b) => workers[b].mins - workers[a].mins);
+  const maxMins = workers[sorted[0]].mins;
+
+  list.innerHTML = '';
+  sorted.forEach((name,i) => {
+    const w = workers[name];
+    const pct = maxMins > 0 ? Math.round(w.mins/maxMins*100) : 0;
+    const row = document.createElement('div');
+    row.className = 'worker-row' + (i===0?' top-worker':'');
+    row.innerHTML = `
+      <div class="worker-name-cell">
+        <div class="worker-name">
+          ${w.isLeader?'⭐ ':''}${name}
+        </div>
+        <div class="worker-shifts">${w.shifts} turno${w.shifts!==1?'s':''}</div>
+        <div class="bar-wrap"><div class="bar-fill" style="width:${pct}%"></div></div>
+      </div>
+      <div class="worker-hours">${fmtHours(w.mins)}</div>
+    `;
+    list.appendChild(row);
+  });
+}
+
+// ── MODAL ──────────────────────────────────────────────────
+function openModal(day, key){
+  selectedDay = key;
+  const d = new Date(currentYear, currentMonth, day);
+  const days = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  document.getElementById('modalDateBadge').textContent =
+    `${days[d.getDay()]} ${pad(day)} de ${MONTHS[currentMonth]} ${currentYear}`;
+
+  renderExistingShifts(key);
+  updateHoursPreview();
+
+  document.getElementById('fName').value = '';
+  selectRole('Calderista');
+
+  document.getElementById('modalOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('fName').focus(), 200);
+}
+
+function closeModal(){
+  document.getElementById('modalOverlay').classList.remove('open');
+  selectedDay = null;
+}
+
+function renderExistingShifts(key){
+  const container = document.getElementById('existingShifts');
+  const dayShifts = shifts[key] || [];
+
+  if(dayShifts.length === 0){
+    container.innerHTML = '<div class="empty-state" style="padding:8px 0 0">Sin turnos asignados para este día.</div>';
+    return;
+  }
+
+  container.innerHTML = '';
+  dayShifts.forEach((s,idx) => {
+    const item = document.createElement('div');
+    item.className = 'modal-shift-item';
+    item.innerHTML = `
+      <div class="modal-shift-info">
+        <div class="modal-shift-name">
+          ${s.role==='Líder de Turno'?'⭐ ':'🔧 '}${s.name}
+        </div>
+        <div class="modal-shift-detail">
+          ${s.role} &nbsp;·&nbsp; ${s.entry} – ${s.exit} &nbsp;·&nbsp; ${fmtHours(s.hours)}
+        </div>
+      </div>
+      <button class="btn-remove-shift" title="Eliminar turno" onclick="removeShift('${key}',${idx})">✕</button>
+    `;
+    container.appendChild(item);
+  });
+}
+
+function removeShift(key, idx){
+  if(!shifts[key]) return;
+  shifts[key].splice(idx,1);
+  if(shifts[key].length === 0) delete shifts[key];
+  saveState();
+  renderExistingShifts(key);
+  renderCalendar();
+}
+
+// ── FORM ───────────────────────────────────────────────────
+function selectRole(role){
+  selectedRole = role;
+  document.getElementById('roleOp').className =
+    'role-btn' + (role==='Calderista' ? ' active-op' : '');
+  document.getElementById('roleLeader').className =
+    'role-btn' + (role==='Líder de Turno' ? ' active-leader' : '');
+}
+
+function applyPreset(entry, exit){
+  document.getElementById('fEntry').value = entry;
+  document.getElementById('fExit').value  = exit;
+  updateHoursPreview();
+}
+
+function updateHoursPreview(){
+  const entry = document.getElementById('fEntry').value;
+  const exit  = document.getElementById('fExit').value;
+  if(!entry||!exit) return;
+  const mins = calcHours(entry, exit);
+  document.getElementById('hoursPreview').textContent = fmtHours(mins);
+}
+
+document.getElementById('fEntry').addEventListener('change', updateHoursPreview);
+document.getElementById('fExit').addEventListener('change',  updateHoursPreview);
+
+document.getElementById('btnAddShift').addEventListener('click', () => {
+  const name  = document.getElementById('fName').value.trim();
+  const entry = document.getElementById('fEntry').value;
+  const exit  = document.getElementById('fExit').value;
+
+  if(!name){ alert('Ingrese el nombre del operador.'); return; }
+  if(!entry||!exit){ alert('Complete los horarios de entrada y salida.'); return; }
+
+  const mins = calcHours(entry, exit);
+
+  if(!shifts[selectedDay]) shifts[selectedDay] = [];
+  shifts[selectedDay].push({ name, role: selectedRole, entry, exit, hours: mins });
+
+  saveState();
+  renderExistingShifts(selectedDay);
+  renderCalendar();
+
+  document.getElementById('fName').value = '';
+  document.getElementById('fName').focus();
+});
+
+// ── NAV ────────────────────────────────────────────────────
+document.getElementById('btnPrev').addEventListener('click', () => {
+  currentMonth--;
+  if(currentMonth < 0){ currentMonth = 11; currentYear--; }
+  renderCalendar();
+});
+
+document.getElementById('btnNext').addEventListener('click', () => {
+  currentMonth++;
+  if(currentMonth > 11){ currentMonth = 0; currentYear++; }
+  renderCalendar();
+});
+
+document.getElementById('btnToday').addEventListener('click', () => {
+  currentYear  = new Date().getFullYear();
+  currentMonth = new Date().getMonth();
+  renderCalendar();
+});
+
+document.getElementById('btnModalClose').addEventListener('click', closeModal);
+document.getElementById('modalOverlay').addEventListener('click', e => {
+  if(e.target === document.getElementById('modalOverlay')) closeModal();
+});
+
+document.addEventListener('keydown', e => {
+  if(e.key==='Escape') closeModal();
+});
+
+// ── CLEAR ──────────────────────────────────────────────────
+document.getElementById('btnClear').addEventListener('click', () => {
+  const prefix = `${currentYear}-${pad(currentMonth+1)}-`;
+  const count = Object.keys(shifts).filter(k=>k.startsWith(prefix)).length;
+  if(count===0){ alert('No hay turnos asignados en este mes.'); return; }
+  if(!confirm(`¿Eliminar TODOS los turnos de ${MONTHS[currentMonth]} ${currentYear}? (${count} día${count!==1?'s':''})`)) return;
+  Object.keys(shifts).filter(k=>k.startsWith(prefix)).forEach(k=>delete shifts[k]);
+  saveState();
+  renderCalendar();
+});
+
+// ── INIT ───────────────────────────────────────────────────
+renderCalendar();
+</script>
+</body>
+</html>
